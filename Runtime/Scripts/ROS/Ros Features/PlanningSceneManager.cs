@@ -396,7 +396,7 @@ public class PlanningSceneObjects
     public List<CollisionObject> Remote => collisionObjects.Values.Where(o => o.RemoteAuthority).ToList();
     public List<CollisionObject> Attached => collisionObjects.Values.Where(o => o.IsAttached).ToList();
 
-    readonly static ConcurrentQueue<CollisionObject> addObjectsQueue = new ConcurrentQueue<CollisionObject>();
+    readonly ConcurrentQueue<CollisionObject> addObjectsQueue = new ConcurrentQueue<CollisionObject>();
     public void EnqueueAddition(CollisionObject obj) => addObjectsQueue.Enqueue(obj);
     public bool GetNextAddition(out CollisionObject obj) => addObjectsQueue.TryDequeue(out obj);
 
@@ -406,6 +406,8 @@ public class PlanningSceneObjects
     /// <param name="obj"></param>
     public void RegisterObject(IPlanningSceneObject obj)
     {
+        if (obj == null) return;
+        
         allObjects[obj.ID] = obj;
 
         if (obj is CollisionObject collisionObject)
@@ -426,7 +428,7 @@ public class PlanningSceneObjects
 
     public bool HasObject(string id)
     {
-        return allObjects.ContainsKey(id) || addObjectsQueue.Any(o => o.ID == id);
+        return allObjects.ContainsKey(id) || addObjectsQueue.Any(o => (o != null && o.ID == id));
     }
 
     public bool HasObject(IPlanningSceneObject obj)

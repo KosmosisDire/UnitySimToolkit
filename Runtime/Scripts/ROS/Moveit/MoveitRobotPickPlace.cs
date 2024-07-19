@@ -16,7 +16,8 @@ public class MoveitRobotPickPlace : RosBehaviour
     public CollisionObject targetObject;
     public Transform placePositionOverride;
     private MoveitRobot robot;
-
+    public MoveitRobot MoveitRobot => robot;
+    
     public override async Task Init()
     {
         ROS.RegisterPublisher<PickMsg>(pickTopic);
@@ -90,9 +91,9 @@ public class MoveitRobotPickPlace : RosBehaviour
     public async void PickAndPlace(CollisionObject targetObject, Vector3 position, Quaternion rotation, float approach_height = 0.1f)
     {
         Pick(targetObject, approach_height);
-        await Awaitable.WaitForSecondsAsync(0.5f);
+        await Awaitable.WaitForSecondsAsync(1);
         Place(position, rotation, approach_height);
-        await Awaitable.WaitForSecondsAsync(0.5f);
+        await Awaitable.WaitForSecondsAsync(1);
         ExecuteQueue();
     }
 

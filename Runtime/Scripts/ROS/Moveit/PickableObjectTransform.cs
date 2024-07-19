@@ -33,7 +33,7 @@ public class PickableObjectTransform : MonoBehaviour
         }
 
         toolbar = new Toolbar<CollisionObject>();
-        var pick = new ToolbarItem<CollisionObject>(Icons.GetVectorIcon("play"), "Pick", async (obj) =>
+        var pickandplace = new ToolbarItem<CollisionObject>(Icons.GetVectorIcon("play"), "Pick & Place", async (obj) =>
         {
             transform.GetPositionAndRotation(out var targetPosition, out var targetRotation);
             if (robot != null && robot.placePositionOverride != null)
@@ -48,7 +48,39 @@ public class PickableObjectTransform : MonoBehaviour
             robot.PickAndPlace(obj, targetPosition, targetRotation);
         });
 
+        var pick = new ToolbarItem<CollisionObject>(Icons.GetVectorIcon("play"), "Pick", async (obj) =>
+        {
+            transform.GetPositionAndRotation(out var targetPosition, out var targetRotation);
+            if (robot != null && robot.placePositionOverride != null)
+            {
+                robot.placePositionOverride.GetPositionAndRotation(out targetPosition, out targetRotation);
+            }
+
+            SetSelected(false);
+            await PlanningSceneManager.UpdateFromRemote();
+            Debug.Log("Picking object " + obj.ID);
+            
+            robot.Pick(obj);
+        });
+
+        var place = new ToolbarItem<CollisionObject>(Icons.GetVectorIcon("play"), "Place", async (obj) =>
+        {
+            transform.GetPositionAndRotation(out var targetPosition, out var targetRotation);
+            if (robot != null && robot.placePositionOverride != null)
+            {
+                robot.placePositionOverride.GetPositionAndRotation(out targetPosition, out targetRotation);
+            }
+
+            SetSelected(false);
+            await PlanningSceneManager.UpdateFromRemote();
+            Debug.Log("Picking object " + obj.ID);
+            
+            robot.Place(targetPosition, targetRotation);
+        });
+
         toolbar.AddItem(pick, collisionObject);
+        toolbar.AddItem(place, collisionObject);
+        toolbar.AddItem(pickandplace, collisionObject);
         toolbar.Create(UIManager.rootElement);
         toolbar.Follow(transform, new Vector2(0, -100));
         _ = toolbar.Hide(0);
