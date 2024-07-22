@@ -312,6 +312,9 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
 
             var pos = TFManager.TransformROSWorldToUnityWorld(objMsg.pose.position.ToVector3()).Ros2Unity();
             var rot = objMsg.pose.orientation.ToQuaternion().Ros2Unity();
+
+            var beforeMove = collisionObj.transform.position;
+
             if (collisionObj.IsAttached)
             {
                 collisionObj.transform.SetLocalPositionAndRotation(pos, rot);
@@ -320,6 +323,12 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
             {
                 collisionObj.transform.SetPositionAndRotation(pos, rot);
             }
+
+            var afterMove = collisionObj.transform.position;
+            collisionObj.velocity = (afterMove - beforeMove) / (float) (DateTime.Now - collisionObj.lastUpdateTime).TotalSeconds;
+            collisionObj.lastPosition = collisionObj.transform.position;
+            collisionObj.lastRotation = collisionObj.transform.rotation;
+            collisionObj.lastUpdateTime = DateTime.Now;
         }
 
         var deletedObjects = allCollisionObjects.Where(o => !sceneObjects.Exists(r => r.id == o.ID)).ToArray();

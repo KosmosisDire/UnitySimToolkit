@@ -85,6 +85,8 @@ public class CollisionObject : RosBehaviour, IPlanningSceneObject, IMessageRepre
     [HideInInspector] public Quaternion lastRotation;
     [HideInInspector] public DateTime lastUpdateTime;
 
+    [HideInInspector] public Vector3 velocity;
+
     public List<GameObject> childObjects = new List<GameObject>();
     public UrdfLink attachedTo = null;
     public bool IsAttached => attachedTo != null;
