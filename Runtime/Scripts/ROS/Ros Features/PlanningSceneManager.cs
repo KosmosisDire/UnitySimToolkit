@@ -276,7 +276,7 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
 
         foreach (var obj in SceneObjects.Attached)
         {
-            if (obj.isFrozen) continue;
+            if (obj.isFrozen || !obj.RemoteAuthority) continue;
 
             var attachedObj = attachedObjects.Find(a => a.@object.id == obj.ID);
             if (attachedObj == null)
@@ -288,7 +288,7 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
         foreach (var obj in attachedObjects)
         {
             var existingObj = allCollisionObjects.Find(o => o.ID == obj.@object.id);
-            if (existingObj == null || existingObj.IsAttached) continue;
+            if (existingObj == null || existingObj.IsAttached || !existingObj.RemoteAuthority) continue;
 
             var link = SceneObjects.GetLink(obj.link_name);
             if (link == null) continue;
@@ -299,7 +299,7 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
         var existingObjects = allCollisionObjects.Where(o => sceneObjects.Exists(r => r.id == o.ID)).ToArray();
         foreach (var obj in existingObjects)
         {
-            if (obj.isFrozen) continue;
+            if (obj.isFrozen || !obj.RemoteAuthority) continue;
 
             var collisionObj = obj;
             var objMsg = sceneObjects.Find(o => o.id == collisionObj.ID);
@@ -334,7 +334,7 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
         var deletedObjects = allCollisionObjects.Where(o => !sceneObjects.Exists(r => r.id == o.ID)).ToArray();
         foreach (var obj in deletedObjects)
         {
-            if (obj.isFrozen) continue;
+            if (obj.isFrozen || !obj.RemoteAuthority) continue;
             RemoveObject(obj, true, true);
         }
     }
