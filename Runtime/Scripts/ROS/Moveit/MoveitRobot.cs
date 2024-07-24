@@ -215,7 +215,7 @@ public class MoveitRobot : MonoBehaviour
 
     public void ExecuteSavedTrajectory(MoveGroupController group)
     {
-        var trajectory = TrajectoryDatabase.allTrajectories.First();
+        var trajectory = TrajectoryDatabase.instance.currentTrajectory;
         group.Execute(trajectory);
     }
 

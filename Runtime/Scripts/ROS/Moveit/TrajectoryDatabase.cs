@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Toolkit;
+using Toolkit.Visualization;
 using UnityEngine;
 
 namespace SimToolkit.ROS.Moveit
@@ -9,10 +10,10 @@ namespace SimToolkit.ROS.Moveit
 public class TrajectoryDatabase : MonoBehaviour
 {
     public string folderName = "Paths";
-    private string savePath => Path.Combine(Application.persistentDataPath, folderName + Path.DirectorySeparatorChar);
+    private string SavePath => Path.Combine(Application.persistentDataPath, folderName + Path.DirectorySeparatorChar);
+    public TrajectoryInverseKinematic currentTrajectory;
+    public List<TrajectoryInverseKinematic> allTrajectories = new();
     public static TrajectoryDatabase instance;
-    public static TrajectoryInverseKinematic currentTrajectory;
-    public static List<TrajectoryInverseKinematic> allTrajectories = new List<TrajectoryInverseKinematic>();
 
     void Start()
     {
@@ -28,9 +29,9 @@ public class TrajectoryDatabase : MonoBehaviour
             Destroy(this);
         }
 
-        if (!Directory.Exists(savePath))
+        if (!Directory.Exists(SavePath))
         {
-            Directory.CreateDirectory(savePath);
+            Directory.CreateDirectory(SavePath);
         }
 
         LoadAllTrajectories();
@@ -45,29 +46,30 @@ public class TrajectoryDatabase : MonoBehaviour
     public static void BeginTrajectory(string name)
     {
         Debug.Log("Begin trajectory");
-        currentTrajectory = new TrajectoryInverseKinematic(name);
+        instance.currentTrajectory = new TrajectoryInverseKinematic(name);
     }
 
     public static void SaveTrajectory()
     {
-        var json = JsonUtility.ToJson(currentTrajectory);
-        var name = currentTrajectory.name;
+        var json = JsonUtility.ToJson(instance.currentTrajectory);
+        var name = instance.currentTrajectory.name;
         if (string.IsNullOrEmpty(name))
         {
             name = "Unnamed";
         }
-        var path = Path.Combine(instance.savePath, name + ".json");
+        var path = Path.Combine(instance.SavePath, name + ".json");
         NotificationManager.Notice("Saving trajectory as: " + name);
+        Debug.Log("Saving trajectory to: " + path);
         File.WriteAllText(path, json);
 
-        if (!allTrajectories.Contains(currentTrajectory))
+        if (!instance.allTrajectories.Contains(instance.currentTrajectory))
         {
-            allTrajectories.Add(currentTrajectory);
+            instance.allTrajectories.Add(instance.currentTrajectory);
         }
         else
         {
-            var index = allTrajectories.FindIndex(x => x.name == name);
-            allTrajectories[index] = currentTrajectory;
+            var index = instance.allTrajectories.FindIndex(x => x.name == name);
+            instance.allTrajectories[index] = instance.currentTrajectory;
         }
         
     }
@@ -75,24 +77,24 @@ public class TrajectoryDatabase : MonoBehaviour
     public static void LoadTrajectory(string id)
     {
         Debug.Log("Loading trajectory");
-        var json = File.ReadAllText(Path.Combine(instance.savePath, id + ".json"));
-        currentTrajectory = JsonUtility.FromJson<TrajectoryInverseKinematic>(json);
+        var json = File.ReadAllText(Path.Combine(instance.SavePath, id + ".json"));
+        instance.currentTrajectory = JsonUtility.FromJson<TrajectoryInverseKinematic>(json);
     }
 
     public static void LoadAllTrajectories()
     {
         Debug.Log("Loading all trajectories");
-        allTrajectories.Clear();
-        var files = Directory.GetFiles(instance.savePath);
+        instance.allTrajectories.Clear();
+        var files = Directory.GetFiles(instance.SavePath);
         foreach (var file in files)
         {
             var json = File.ReadAllText(file);
             var trajectory = JsonUtility.FromJson<TrajectoryInverseKinematic>(json);
-            allTrajectories.Add(trajectory);
+            instance.allTrajectories.Add(trajectory);
             NotificationManager.Notice("Loaded Trajectory: " + trajectory.name);
         }
 
-        currentTrajectory = allTrajectories.FirstOrDefault();
+        instance.currentTrajectory = instance.allTrajectories.FirstOrDefault();
     }
 
     public static void SavePose(MoveGroupController group)
@@ -124,31 +126,30 @@ public class TrajectoryDatabase : MonoBehaviour
             return;
         }
 
-        currentTrajectory.positions.Add(group.gizmo.transform.position);
-        currentTrajectory.rotations.Add(group.gizmo.Rotation);
+        instance.currentTrajectory.positions.Add(group.gizmo.transform.position);
+        instance.currentTrajectory.rotations.Add(group.gizmo.Rotation);
 
-        NotificationManager.Notice("Added pose to path: " + currentTrajectory.name);
+        NotificationManager.Notice("Added pose to path: " + instance.currentTrajectory.name);
+        SaveTrajectory();
     }
 
-    void OnDrawGizmos()
+    void Update()
     {
         if (currentTrajectory.positions == null) return;
         for (int i = 0; i < currentTrajectory.positions.Count; i++)
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(currentTrajectory.positions[i], 0.01f);
+            Draw.Sphere(currentTrajectory.positions[i], 0.01f, Color.green, true);
             
             if (i > 0)
             {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawLine(currentTrajectory.positions[i - 1], currentTrajectory.positions[i]);
+                Draw.LinePixel(currentTrajectory.positions[i - 1], currentTrajectory.positions[i], Color.blue);
             }
         }
     }
 
     public static TrajectoryInverseKinematic? GetTrajectory(string name)
     {
-        return allTrajectories.Find(t => t.name == name);
+        return instance.allTrajectories.Find(t => t.name == name);
     }
 }
 }

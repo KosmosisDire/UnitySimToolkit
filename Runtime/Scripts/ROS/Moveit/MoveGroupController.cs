@@ -15,6 +15,7 @@ using RosMessageTypes.Sensor;
 using System.Collections.Generic;
 using SimToolkit.ROS.Srdf;
 using Toolkit;
+using System.Collections;
 namespace SimToolkit.ROS.Moveit
 {
 [Serializable]
@@ -183,6 +184,12 @@ public class MoveGroupController
             return;
         }
 
+        if (jointStates.Count > 2)
+        {
+            NotificationManager.Notice("Invalid trajectory, only a start and end state can be supplied to this function");
+            return;
+        }
+
         state.isComplete = false;
         state.status = TrajectoryStatus.None;
         state.currentTrajectory = trajectory;
@@ -239,19 +246,6 @@ public class MoveGroupController
                     }).ToArray()
                 }
             },
-
-            // trajectory_constraints = new TrajectoryConstraintsMsg()
-            // {
-            //     constraints = jointStates.Select(j => new ConstraintsMsg()
-            //     {
-            //         joint_constraints = j.name.Select((name, i) => new JointConstraintMsg()
-            //         {
-            //             joint_name = name,
-            //             position = j.position[i],
-            //             weight = 1
-            //         }).ToArray()
-            //     }).ToArray()
-            // },
         };
 
         var goal = new MoveGroupActionGoalMsg()
@@ -278,8 +272,25 @@ public class MoveGroupController
         };
 
         var ros = ROSConnection.GetOrCreateInstance();
-        ros.Publish(settings.planningOptions.planRequestTopic, motionPlanRequest);
         ros.Publish(settings.planningOptions.executeRequestTopic, goal);
+    }
+
+    public async void ExecuteMulti(TrajectoryForwardKinematic trajectory)
+    {
+        if (!Enumerable.SequenceEqual(trajectory.jointStates[0].position, jointMirror.JointStatesRemote.position))
+        {
+            trajectory.jointStates = new[] { jointMirror.JointStatesRemote }.Concat(trajectory.jointStates).ToArray();
+        }
+
+        for (int i = 1; i < trajectory.jointStates.Length; i++)
+        {
+            Execute(new TrajectoryForwardKinematic(new[] { trajectory.jointStates[i - 1], trajectory.jointStates[i] }));
+
+            while (!state.IsReady(out _))
+            {
+                await Awaitable.NextFrameAsync();
+            }
+        }
     }
 
     public async void Execute(TrajectoryInverseKinematic trajectory)
@@ -290,7 +301,7 @@ public class MoveGroupController
             NotificationManager.Notice("Failed to solve IK for trajectory");
             return;
         }
-        Execute(plannedTrajectory.Value);
+        ExecuteMulti(plannedTrajectory.Value);
     }
 
     public async Task<JointStateMsg> SolveIK(JointStateMsg startingState, Vector3 gizmoPosition, Quaternion gizmoOrientation)
