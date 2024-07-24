@@ -37,7 +37,7 @@ public class Xacro2URDF
 
         var originalDir = Directory.GetCurrentDirectory();
 
-        var xacroPython = Path.Combine(Application.dataPath, "Resources/ROS/xacro.py");
+        var xacroPython = Path.Combine(Application.dataPath, "Packages/com.kosmosisdire.simtoolkit/Runtime/Resources/ROS/xacro.py");
         xacroPython = xacroPython.Replace("\\", "/");
         if (!File.Exists(xacroPython))
         {

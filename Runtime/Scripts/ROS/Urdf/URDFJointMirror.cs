@@ -83,6 +83,11 @@ public class URDFJointMirror : RosBehaviour
             jointX.target = joint.jointType == ArticulationJointType.RevoluteJoint ? joint.jointPosition[0] * Mathf.Rad2Deg : 0;
             jointX.driveType = ArticulationDriveType.Target;
             joint.xDrive = jointX;
+            joint.twistLock = ArticulationDofLock.FreeMotion;
+            joint.linearLockX = ArticulationDofLock.FreeMotion;
+            joint.linearLockY = ArticulationDofLock.FreeMotion;
+            joint.linearLockZ = ArticulationDofLock.FreeMotion;
+            
         }
 
         startingPositions = joints.Select((joint) => joint.jointPosition).ToList();
@@ -175,7 +180,13 @@ public class URDFJointMirror : RosBehaviour
                 jointX.target *= Mathf.Rad2Deg;
             }
 
+
+
             childJoint.xDrive = jointX;
+            childJoint.twistLock = ArticulationDofLock.FreeMotion;
+            childJoint.linearLockX = ArticulationDofLock.FreeMotion;
+            childJoint.linearLockY = ArticulationDofLock.FreeMotion;
+            childJoint.linearLockZ = ArticulationDofLock.FreeMotion;
             
         }
     }
