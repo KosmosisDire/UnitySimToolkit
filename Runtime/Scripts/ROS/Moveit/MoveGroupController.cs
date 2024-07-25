@@ -304,6 +304,18 @@ public class MoveGroupController
         await ExecuteMultiPointTrajectoryAsync(plannedTrajectory.Value);
     }
 
+    public async Task ExecuteNamedTrajectory(string name, MoveGroupController group)
+    {
+        var trajectory = TrajectoryDatabase.GetTrajectory(name);
+        if (trajectory == null)
+        {
+            Debug.LogError("Trajectory with name " + name + " not found!");
+            return;
+        }
+        TrajectoryDatabase.CurrentTrajectory = trajectory.Value;
+        await group.ExecuteAsync(trajectory.Value);
+    }
+
     public async Task<JointStateMsg> SolveIK(JointStateMsg startingState, Vector3 gizmoPosition, Quaternion gizmoOrientation)
     {
         if (state.isComputingIK) return null;

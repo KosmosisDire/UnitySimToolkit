@@ -208,7 +208,7 @@ public class MoveitRobot : MonoBehaviour
         TargetUpdated(position, orientation, group);
     }
 
-    public void ExecuteSavedTrajectory(MoveGroupController group)
+    public void ExecuteCurrentDatabaseTrajectory(MoveGroupController group)
     {
         var trajectory = TrajectoryDatabase.instance.currentTrajectory;
         group.ExecuteAsync(trajectory);
