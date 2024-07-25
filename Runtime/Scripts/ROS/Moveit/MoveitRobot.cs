@@ -178,12 +178,12 @@ public class MoveitRobot : MonoBehaviour
         toolbars[controller.Name]?.Show();
     }
 
-    public void Execute(MoveGroupController group)
+    public void GoToPlanningPose(MoveGroupController group)
     {
-        _ = ExecuteAsync(group);
+        _ = GoToPlanningPoseAsync(group);
     }
 
-    public async Task ExecuteAsync(MoveGroupController controller)
+    public async Task GoToPlanningPoseAsync(MoveGroupController controller)
     {
         isExecuting = true;
 
@@ -191,12 +191,7 @@ public class MoveitRobot : MonoBehaviour
         var startState = controller.jointMirror.JointStatesRemote;
         var endState = controller.jointMirror.JointStatesLocal;
         var trajectory = new TrajectoryForwardKinematic(new[]{startState, endState});
-        controller.Execute(trajectory);
-
-        while (!controller.state.isComplete)
-        {
-            await Awaitable.NextFrameAsync();
-        }
+        await controller.ExecuteMultiPointTrajectoryAsync(trajectory);
     }
 
     public void SetTarget(string groupName, Vector3 position, Quaternion orientation)
@@ -216,9 +211,8 @@ public class MoveitRobot : MonoBehaviour
     public void ExecuteSavedTrajectory(MoveGroupController group)
     {
         var trajectory = TrajectoryDatabase.instance.currentTrajectory;
-        group.Execute(trajectory);
+        group.ExecuteAsync(trajectory);
     }
-
 
     void Update()
     {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Toolkit;
 using Toolkit.Visualization;
 using UnityEngine;
@@ -14,6 +15,23 @@ public class TrajectoryDatabase : MonoBehaviour
     public TrajectoryInverseKinematic currentTrajectory;
     public List<TrajectoryInverseKinematic> allTrajectories = new();
     public static TrajectoryDatabase instance;
+    private bool loadedFromDisk = false;
+
+    public static async Task AwaitLoad()
+    {
+        while (instance == null || !instance.loadedFromDisk)
+        {
+            await Awaitable.NextFrameAsync();
+        }
+    }
+
+    public static TrajectoryInverseKinematic CurrentTrajectory
+    {
+        get => instance.currentTrajectory;
+        set => instance.currentTrajectory = value;
+    }
+
+    public static List<TrajectoryInverseKinematic> AllTrajectories => instance.allTrajectories;
 
     void Start()
     {
@@ -74,14 +92,22 @@ public class TrajectoryDatabase : MonoBehaviour
         
     }
 
-    public static void LoadTrajectory(string id)
+    public static void DeleteTrajectory(string name)
     {
-        Debug.Log("Loading trajectory");
-        var json = File.ReadAllText(Path.Combine(instance.SavePath, id + ".json"));
-        instance.currentTrajectory = JsonUtility.FromJson<TrajectoryInverseKinematic>(json);
+        var path = Path.Combine(instance.SavePath, name + ".json");
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            instance.allTrajectories.RemoveAll(t => t.name == name);
+            if (instance.currentTrajectory.name == name)
+            {
+                instance.currentTrajectory = instance.allTrajectories.FirstOrDefault();
+            }
+            NotificationManager.Notice("Deleted trajectory: " + name);
+        }
     }
 
-    public static void LoadAllTrajectories()
+    private static void LoadAllTrajectories()
     {
         Debug.Log("Loading all trajectories");
         instance.allTrajectories.Clear();
@@ -95,6 +121,7 @@ public class TrajectoryDatabase : MonoBehaviour
         }
 
         instance.currentTrajectory = instance.allTrajectories.FirstOrDefault();
+        instance.loadedFromDisk = true;
     }
 
     public static void SavePose(MoveGroupController group)

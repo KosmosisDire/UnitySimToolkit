@@ -7,7 +7,6 @@ using RosMessageTypes.BuiltinInterfaces;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Moveit;
 using RosMessageTypes.Std;
-using SimToolkit;
 using System;
 using SimToolkit.ROS.Urdf;
 using System.Linq;
@@ -15,7 +14,7 @@ using RosMessageTypes.Sensor;
 using System.Collections.Generic;
 using SimToolkit.ROS.Srdf;
 using Toolkit;
-using System.Collections;
+
 namespace SimToolkit.ROS.Moveit
 {
 [Serializable]
@@ -38,6 +37,7 @@ public class MoveGroupController
     [HideInInspector] public event Action<TransformGizmo.Axis, TransformGizmo.ControlType, MoveGroupController> OnGrab;
     [HideInInspector] public event Action<TransformGizmo.Axis, TransformGizmo.ControlType, MoveGroupController> OnRelease;
 
+    
     public MoveGroupController(MoveGroup group, MoveGroupControllerSettings settings)        
     {
         this.moveGroup = group;
@@ -144,7 +144,7 @@ public class MoveGroupController
         return plannedTrajectory;
     }
 
-    public void Execute(TrajectoryForwardKinematic trajectory)
+    private void ExecuteTwoPointTrajectory(TrajectoryForwardKinematic trajectory)
     {
         if (!state.IsReady(out var feedback))
         {
@@ -275,7 +275,7 @@ public class MoveGroupController
         ros.Publish(settings.planningOptions.executeRequestTopic, goal);
     }
 
-    public async void ExecuteMulti(TrajectoryForwardKinematic trajectory)
+    public async Task ExecuteMultiPointTrajectoryAsync(TrajectoryForwardKinematic trajectory)
     {
         if (!Enumerable.SequenceEqual(trajectory.jointStates[0].position, jointMirror.JointStatesRemote.position))
         {
@@ -284,7 +284,7 @@ public class MoveGroupController
 
         for (int i = 1; i < trajectory.jointStates.Length; i++)
         {
-            Execute(new TrajectoryForwardKinematic(new[] { trajectory.jointStates[i - 1], trajectory.jointStates[i] }));
+            ExecuteTwoPointTrajectory(new TrajectoryForwardKinematic(new[] { trajectory.jointStates[i - 1], trajectory.jointStates[i] }));
 
             while (!state.IsReady(out _))
             {
@@ -293,7 +293,7 @@ public class MoveGroupController
         }
     }
 
-    public async void Execute(TrajectoryInverseKinematic trajectory)
+    public async Task ExecuteAsync(TrajectoryInverseKinematic trajectory)
     {
         var plannedTrajectory = await GetFKTrajectory(trajectory);
         if (!plannedTrajectory.HasValue)
@@ -301,7 +301,7 @@ public class MoveGroupController
             NotificationManager.Notice("Failed to solve IK for trajectory");
             return;
         }
-        ExecuteMulti(plannedTrajectory.Value);
+        await ExecuteMultiPointTrajectoryAsync(plannedTrajectory.Value);
     }
 
     public async Task<JointStateMsg> SolveIK(JointStateMsg startingState, Vector3 gizmoPosition, Quaternion gizmoOrientation)

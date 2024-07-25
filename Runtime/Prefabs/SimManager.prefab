@@ -575,7 +575,7 @@ GameObject:
   m_Component:
   - component: {fileID: 399524906929103471}
   - component: {fileID: 6955298118936958782}
-  - component: {fileID: 768790474561008547}
+  - component: {fileID: 1818253450999561382}
   m_Layer: 0
   m_Name: Trajectory Database
   m_TagString: Untagged
@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   folderName: Paths
---- !u!114 &768790474561008547
+--- !u!114 &1818253450999561382
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -620,53 +620,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4092821069961124700}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e44f7d6d2c15f0d47a951d2258429c9b, type: 3}
+  m_Script: {fileID: 11500000, guid: 4fb843888e5903c4980a0d344c3c03f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  items:
-  - icon: {fileID: 7388822144124034973, guid: 29ec1b3e6030c3a4ab5e2a13fdc660aa, type: 3}
-    text: New Path
-    onClick:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6955298118936958782}
-          m_TargetAssemblyTypeName: TrajectoryDatabase, Assembly-CSharp
-          m_MethodName: BeginTrajectory
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: NewPath
-            m_BoolArgument: 0
-          m_CallState: 2
-  - icon: {fileID: 7388822144124034973, guid: 32fa52b39e7894b4a948fedbeef032dd, type: 3}
-    text: Save
-    onClick:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6955298118936958782}
-          m_TargetAssemblyTypeName: TrajectoryDatabase, Assembly-CSharp
-          m_MethodName: SaveTrajectory
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  absolutePosition: 1
-  useLeft: 1
-  left: 5
-  useTop: 0
-  top: 0
-  useRight: 0
-  right: 0
-  useBottom: 1
-  bottom: 5
 --- !u!1 &5329338268061469881
 GameObject:
   m_ObjectHideFlags: 0
@@ -717,7 +673,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 394b34c8c9293f349abee97119b29371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keepOnLoad: 1
+  keepOnLoad: 0
   useParamServer: 1
   useFileServer: 1
   usePlanningScene: 1
