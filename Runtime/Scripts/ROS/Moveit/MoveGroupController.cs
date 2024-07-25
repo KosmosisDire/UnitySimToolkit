@@ -304,7 +304,7 @@ public class MoveGroupController
         await ExecuteMultiPointTrajectoryAsync(plannedTrajectory.Value);
     }
 
-    public async Task ExecuteNamedTrajectory(string name, MoveGroupController group)
+    public async Task ExecuteNamedTrajectory(string name)
     {
         var trajectory = TrajectoryDatabase.GetTrajectory(name);
         if (trajectory == null)
@@ -313,7 +313,7 @@ public class MoveGroupController
             return;
         }
         TrajectoryDatabase.CurrentTrajectory = trajectory.Value;
-        await group.ExecuteAsync(trajectory.Value);
+        await ExecuteAsync(trajectory.Value);
     }
 
     public async Task<JointStateMsg> SolveIK(JointStateMsg startingState, Vector3 gizmoPosition, Quaternion gizmoOrientation)
