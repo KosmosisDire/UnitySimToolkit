@@ -10,6 +10,7 @@ public struct TrajectoryInverseKinematic
     public List<Vector3> positions;
     public List<Quaternion> rotations;
     public JointStateMsg startingState;
+    public float[] velAcc;
 
     public TrajectoryInverseKinematic(string name)
     {
@@ -17,6 +18,7 @@ public struct TrajectoryInverseKinematic
         positions = new List<Vector3>();
         rotations = new List<Quaternion>();
         startingState = new JointStateMsg();
+        velAcc = null;
     }
 
     public TrajectoryInverseKinematic(JointStateMsg startingState, IEnumerable<Vector3> positions, IEnumerable<Quaternion> rotations)
@@ -25,6 +27,7 @@ public struct TrajectoryInverseKinematic
         this.startingState = startingState;
         this.positions = new List<Vector3>(positions);
         this.rotations = new List<Quaternion>(rotations);
+        velAcc = null;
     }
 
     public readonly async Task<TrajectoryForwardKinematic?> ToForwardKinematic(MoveGroupController forGroup)

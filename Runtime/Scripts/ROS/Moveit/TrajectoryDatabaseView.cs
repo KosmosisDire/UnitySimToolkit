@@ -76,12 +76,58 @@ public class TrajectoryDatabaseView : MonoBehaviour
         };
         buttonContainer.Add(trajButton);
 
+        // add two text fields for velocity and acceleration
+        Debug.Log(trajectory.velAcc);
+        if (trajectory.velAcc is float[] velAcc && velAcc.Length == 2)
+        {
+            var velocityField = new FloatField();
+            var velocityInput = velocityField.Q("unity-text-input");
+
+            velocityField.style.width = 35;
+            velocityField.style.height = 26;
+            velocityInput.style.paddingBottom = 1;
+            velocityInput.style.paddingTop = 1;
+            velocityInput.style.paddingLeft = 2;
+            velocityInput.style.paddingRight = 2;
+            velocityField.style.flexShrink = 1;
+            velocityField.style.flexGrow = 0;
+            velocityField.value = velAcc[0];
+
+            velocityField.RegisterValueChangedCallback(evt =>
+            {
+                velAcc[0] = evt.newValue;
+                TrajectoryDatabase.CurrentTrajectory = trajectory;
+                TrajectoryDatabase.SaveTrajectory();
+            });
+
+            buttonContainer.Add(velocityField);
+
+            var accelerationField = new FloatField();
+            var accelerationInput = accelerationField.Q("unity-text-input");
+            accelerationField.style.width = 35;
+            accelerationField.style.height = 26;
+            accelerationInput.style.paddingBottom = 1;
+            accelerationInput.style.paddingTop = 1;
+            accelerationInput.style.paddingLeft = 2;
+            accelerationInput.style.paddingRight = 2;
+            accelerationField.style.flexGrow = 0;
+            accelerationField.value = velAcc[1];
+
+            accelerationField.RegisterValueChangedCallback(evt =>
+            {
+                velAcc[1] = evt.newValue;
+                TrajectoryDatabase.CurrentTrajectory = trajectory;
+                TrajectoryDatabase.SaveTrajectory();
+            });
+
+            buttonContainer.Add(accelerationField);
+        }
+
         // add a delete button to the trajectory button
         var deleteButton = new Button(Background.FromVectorImage(Icons.GetVectorIcon("trash")));
         buttonContainer.Add(deleteButton);
-        deleteButton.style.position = Position.Absolute;
-        deleteButton.style.right = 3;
-        deleteButton.style.top = 3;
+        deleteButton.style.marginRight = 3;
+        deleteButton.style.marginTop = 3;
         deleteButton.style.width = 20;
         deleteButton.style.height = 20;
         deleteButton.style.paddingBottom = 1;

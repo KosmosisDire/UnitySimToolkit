@@ -210,8 +210,7 @@ public class MoveitRobot : MonoBehaviour
 
     public void ExecuteCurrentDatabaseTrajectory(MoveGroupController group)
     {
-        var trajectory = TrajectoryDatabase.instance.currentTrajectory;
-        group.ExecuteAsync(trajectory);
+        _ = group.ExecuteNamedTrajectory(TrajectoryDatabase.CurrentTrajectory.name);
     }
 
     void Update()

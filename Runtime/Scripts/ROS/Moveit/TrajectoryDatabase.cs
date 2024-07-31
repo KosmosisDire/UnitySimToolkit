@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace SimToolkit.ROS.Moveit
 {
+
 public class TrajectoryDatabase : MonoBehaviour
 {
     public string folderName = "Paths";
@@ -16,6 +17,15 @@ public class TrajectoryDatabase : MonoBehaviour
     public List<TrajectoryInverseKinematic> allTrajectories = new();
     public static TrajectoryDatabase instance;
     private bool loadedFromDisk = false;
+
+    public float pointRadius = 0.01f;
+    public Color lineColor = Color.blue;
+    public Color pointColor = Color.green;
+    public Color directionColor = Color.red;
+
+    private bool pointSelected = false;
+    private TransformGizmo gizmo;
+
 
     public static async Task AwaitLoad()
     {
@@ -64,7 +74,10 @@ public class TrajectoryDatabase : MonoBehaviour
     public static void BeginTrajectory(string name)
     {
         Debug.Log("Begin trajectory");
-        instance.currentTrajectory = new TrajectoryInverseKinematic(name);
+        instance.currentTrajectory = new TrajectoryInverseKinematic(name)
+        {
+            velAcc = new float[] { 1, 1 } // velocity scale, acceleration scale
+        };
     }
 
     public static void SaveTrajectory()
@@ -76,8 +89,6 @@ public class TrajectoryDatabase : MonoBehaviour
             name = "Unnamed";
         }
         var path = Path.Combine(instance.SavePath, name + ".json");
-        NotificationManager.Notice("Saving trajectory as: " + name);
-        Debug.Log("Saving trajectory to: " + path);
         File.WriteAllText(path, json);
 
         if (!instance.allTrajectories.Contains(instance.currentTrajectory))
@@ -116,8 +127,14 @@ public class TrajectoryDatabase : MonoBehaviour
         {
             var json = File.ReadAllText(file);
             var trajectory = JsonUtility.FromJson<TrajectoryInverseKinematic>(json);
+            if (trajectory.velAcc is not float[])
+            {
+                trajectory.velAcc = new float[] { 1, 1 };
+            }
             instance.allTrajectories.Add(trajectory);
             NotificationManager.Notice("Loaded Trajectory: " + trajectory.name);
+
+            
         }
 
         instance.currentTrajectory = instance.allTrajectories.FirstOrDefault();
@@ -163,15 +180,68 @@ public class TrajectoryDatabase : MonoBehaviour
     void Update()
     {
         if (currentTrajectory.positions == null) return;
+
+        if (pointSelected && gizmo && !gizmo.IsHovered && Input.GetMouseButtonUp(0))
+        {
+            pointSelected = false;
+            Destroy(gizmo.gameObject);
+        }
+
         for (int i = 0; i < currentTrajectory.positions.Count; i++)
         {
-            Draw.Sphere(currentTrajectory.positions[i], 0.01f, Color.green, true);
+            Draw.LinePixel(currentTrajectory.positions[i], currentTrajectory.positions[i] + currentTrajectory.rotations[i] * Vector3.forward * pointRadius * 5, directionColor);
             
             if (i > 0)
             {
-                Draw.LinePixel(currentTrajectory.positions[i - 1], currentTrajectory.positions[i], Color.blue);
+                Draw.LinePixel(currentTrajectory.positions[i - 1], currentTrajectory.positions[i], lineColor);
             }
+
+            var drawPointColor = pointColor;
+
+            var ray = Math3d.MouseRay();
+            if (Math3d.RayIntersectsSphere(ray.origin, ray.direction, currentTrajectory.positions[i], pointRadius, out _))
+            {
+                if (gizmo && gizmo.IsHovered) continue;
+                
+                if (Input.GetMouseButtonUp(2))
+                {
+                    currentTrajectory.positions.RemoveAt(i);
+                    currentTrajectory.rotations.RemoveAt(i);
+                    SaveTrajectory();
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    pointSelected = true;
+
+                    gizmo = TransformGizmo.Create(null);
+                    gizmo.SetPosition(currentTrajectory.positions[i]);
+                    gizmo.SetRotation(currentTrajectory.rotations[i]);
+
+                    var localIndex = i;
+                    gizmo.OnMove += (pos, rot) =>
+                    {
+                        currentTrajectory.positions[localIndex] = pos;
+                        SaveTrajectory();
+                    };
+
+                    gizmo.OnRotate += (pos, rot) =>
+                    {
+                        currentTrajectory.rotations[localIndex] = rot;
+                        SaveTrajectory();
+                    };
+
+                    break;
+                }
+
+                drawPointColor = Color.yellow;
+                
+            }
+
+            Draw.Sphere(currentTrajectory.positions[i], pointRadius, drawPointColor, true);
         }
+
+        
     }
 
     public static TrajectoryInverseKinematic? GetTrajectory(string name)

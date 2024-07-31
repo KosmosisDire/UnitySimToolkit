@@ -1,13 +1,13 @@
 {
   "name": "com.kosmosisdire.simtoolkit",
-  "version": "0.0.1-preview",
+  "version": "0.0.2-preview",
   "displayName": "Sim Toolkit",
   "description": "Toolkit for creating robotics simulations in Unity.",
   "unity": "2023.1",
   "dependencies": {
     "com.unity.robotics.ros-tcp-connector": "0.7.0-preview",
     "com.kosmosisdire.rosmessages": "0.0.1-preview",
-    "com.kosmosisdire.techtoolkit": "0.0.1-preview",
+    "com.kosmosisdire.techtoolkit": "0.0.2-preview",
     "com.kosmosisdire.urdfdotnet": "0.0.1-preview"
   },
   "author": {

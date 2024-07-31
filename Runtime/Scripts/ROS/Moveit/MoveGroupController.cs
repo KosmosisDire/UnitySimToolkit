@@ -313,7 +313,19 @@ public class MoveGroupController
             return;
         }
         TrajectoryDatabase.CurrentTrajectory = trajectory.Value;
+        var oldVelocityScaling = settings.planningOptions.maxVelocityScaling;
+        var oldAccelerationScaling = settings.planningOptions.maxAccelerationScaling;
+
+        if (trajectory.Value.velAcc is float[] context)
+        {
+            settings.planningOptions.maxVelocityScaling = context[0];
+            settings.planningOptions.maxAccelerationScaling = context[1];
+        }
+
         await ExecuteAsync(trajectory.Value);
+
+        settings.planningOptions.maxVelocityScaling = oldVelocityScaling;
+        settings.planningOptions.maxAccelerationScaling = oldAccelerationScaling;
     }
 
     public async Task<JointStateMsg> SolveIK(JointStateMsg startingState, Vector3 gizmoPosition, Quaternion gizmoOrientation)
