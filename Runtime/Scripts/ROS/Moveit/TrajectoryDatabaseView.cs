@@ -13,7 +13,7 @@ public class TrajectoryDatabaseView : MonoBehaviour
         var databaseContainer = new VisualElement();
         databaseContainer.AddToClassList("panel");
         databaseContainer.style.width = 300;
-        databaseContainer.style.height = 400;
+        databaseContainer.style.height = Length.Auto();
         databaseContainer.style.position = Position.Absolute;
         databaseContainer.style.left = 0;
         databaseContainer.style.bottom = 0;
