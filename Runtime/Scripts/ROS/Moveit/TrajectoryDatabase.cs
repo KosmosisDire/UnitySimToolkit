@@ -21,7 +21,6 @@ public class TrajectoryDatabase : MonoBehaviour
     public float pointRadius = 0.01f;
     public Color lineColor = Color.blue;
     public Color pointColor = Color.green;
-    public Color directionColor = Color.red;
 
     private bool pointSelected = false;
     private TransformGizmo gizmo;
@@ -189,7 +188,9 @@ public class TrajectoryDatabase : MonoBehaviour
 
         for (int i = 0; i < currentTrajectory.positions.Count; i++)
         {
-            Draw.LinePixel(currentTrajectory.positions[i], currentTrajectory.positions[i] + currentTrajectory.rotations[i] * Vector3.forward * pointRadius * 5, directionColor);
+            Draw.LinePixel(currentTrajectory.positions[i], currentTrajectory.positions[i] + currentTrajectory.rotations[i] * Vector3.right * pointRadius * 5, Color.red);
+            Draw.LinePixel(currentTrajectory.positions[i], currentTrajectory.positions[i] + currentTrajectory.rotations[i] * Vector3.up * pointRadius * 5, Color.green);
+            Draw.LinePixel(currentTrajectory.positions[i], currentTrajectory.positions[i] + currentTrajectory.rotations[i] * Vector3.forward * pointRadius * 5, Color.blue);
             
             if (i > 0)
             {
