@@ -20,7 +20,7 @@ public class PlanningSceneManager : RosFeatureSingleton<PlanningSceneManager>
     public bool notifyChanges = true;
     public string applyPlanningSceneService = "/apply_planning_scene";
     public string getPlanningSceneService = "/get_planning_scene";
-    public float refreshRate = 0.25f;
+    public float refreshRate = 0.75f;
 
     public static PlanningSceneObjects SceneObjects { get; private set; } = new PlanningSceneObjects();
     public static PlanningSceneMsg PlanningScene { get; private set; }
