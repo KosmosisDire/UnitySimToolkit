@@ -21,7 +21,10 @@ public class TrajectoryDatabaseView : MonoBehaviour
 
         databaseContainer.Add(new Label("Trajectory Database"));
 
-        var trajectoryListContainer = new VisualElement();
+        var trajectoryListContainer = new ScrollView();
+        trajectoryListContainer.style.flexGrow = 1;
+        trajectoryListContainer.style.flexShrink = 1;
+        trajectoryListContainer.style.maxHeight = 500;
         databaseContainer.Add(trajectoryListContainer);
 
         foreach (var trajectory in TrajectoryDatabase.AllTrajectories)
@@ -59,6 +62,7 @@ public class TrajectoryDatabaseView : MonoBehaviour
         buttonContainer.style.flexDirection = FlexDirection.Row;
         buttonContainer.style.justifyContent = Justify.SpaceBetween;
         buttonContainer.style.maxWidth = Length.Percent(100);
+        buttonContainer.style.minHeight = 35;
         parent.Add(buttonContainer);
 
         var trajButton = new Button();
