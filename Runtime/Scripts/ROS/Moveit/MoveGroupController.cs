@@ -131,14 +131,14 @@ public class MoveGroupController
         var startingState = moveGroup.FilterJoints(trajectory.startingState);
         for (int i = 0; i < trajectory.positions.Count; i++)
         {
-            var states = await SolveIK(startingState, trajectory.positions[i], trajectory.rotations[i]);
-            if (states == null)
+            startingState = await SolveIK(startingState, trajectory.positions[i], trajectory.rotations[i]);
+            startingState = moveGroup.FilterJoints(startingState);
+            if (startingState == null)
             {
                 return null;
             }
 
-            plannedTrajectory.jointStates[i] = states;
-            startingState = states;
+            plannedTrajectory.jointStates[i] = startingState;
         }
 
         return plannedTrajectory;
@@ -238,10 +238,10 @@ public class MoveGroupController
             {
                 new ConstraintsMsg()
                 {
-                    joint_constraints = jointStates[jointStates.Count - 1].name.Select((name, i) => new JointConstraintMsg()
+                    joint_constraints = jointStates[1].name.Select((name, i) => new JointConstraintMsg()
                     {
                         joint_name = name,
-                        position = jointStates[jointStates.Count - 1].position[i],
+                        position = jointStates[1].position[i],
                         weight = 1
                     }).ToArray()
                 }
