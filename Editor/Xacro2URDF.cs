@@ -37,11 +37,11 @@ public class Xacro2URDF
 
         var originalDir = Directory.GetCurrentDirectory();
 
-        var xacroPython = Path.Combine(Application.dataPath, "Packages/com.kosmosisdire.simtoolkit/Runtime/Resources/ROS/xacro.py");
+        var xacroPython = Path.Combine(Application.dataPath, "../Packages/com.kosmosisdire.simtoolkit/Runtime/Resources/ROS/xacro.py");
         xacroPython = xacroPython.Replace("\\", "/");
         if (!File.Exists(xacroPython))
         {
-            Debug.LogError("xacro.py not found");
+            Debug.LogError("xacro.py not found at " + xacroPython);
             return;
         }
 
@@ -299,7 +299,10 @@ public class Xacro2URDF
         foreach (Match match in propertyMatches)
         {
             // property name -> full match
-            properties.Add(match.Groups[2].Value, match.Groups[1].Value);
+            if (!properties.ContainsKey(match.Groups[2].Value))
+                properties.Add(match.Groups[2].Value, match.Groups[1].Value);
+            else
+                properties[match.Groups[2].Value] = match.Groups[1].Value;
         }
 
         for (int i = 0; i < successfulPaths.Count; i++)
