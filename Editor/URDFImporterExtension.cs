@@ -17,7 +17,7 @@ public class URDFImporterExtension
     }
 
     [MenuItem("Assets/Import Robot from this .urdf")]
-    public static async void ImportURDF()
+    public static void ImportURDF()
     {
         string assetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
 
@@ -25,7 +25,7 @@ public class URDFImporterExtension
         {
             if (assetPath != "")
             {
-                await URDFBuilder.Build(assetPath);
+                URDFBuilder.Build(assetPath);
             }
         }
         else
@@ -43,14 +43,14 @@ public class URDFImporterExtension
     }
 
     [MenuItem("Assets/Import Robot from this .xacro")]
-    public static async void ImportXACRO()
+    public static void ImportXACRO()
     {
         string assetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
 
         var outputDir = PathHelper.GetParentPath(PathHelper.GetParentPath(assetPath));
         var outputPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(assetPath) + ".urdf");
         new XacroConverter(assetPath, outputPath).Convert();
-        await URDFBuilder.Build(outputPath);
+        URDFBuilder.Build(outputPath);
 
         File.Delete(outputPath);
     }

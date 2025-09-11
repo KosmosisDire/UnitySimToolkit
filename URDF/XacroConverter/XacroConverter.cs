@@ -42,7 +42,7 @@ public class XacroConverter
 
     private void RemoveXacroElements(XmlElement onNode)
     {
-        XmlNodeList? xacroNodes = onNode.SelectNodes("//*[starts-with(name(), 'xacro:')]");
+        XmlNodeList xacroNodes = onNode.SelectNodes("//*[starts-with(name(), 'xacro:')]");
         if (xacroNodes == null) return;
         
         foreach (XmlNode xacroNode in xacroNodes)

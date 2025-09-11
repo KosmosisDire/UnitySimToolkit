@@ -55,8 +55,6 @@ public class UrdfIKController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"IK failed to converge. Final error: {result.positionError:F4}m");
-
             // You can still apply the best solution found
             if (result.positionError < 0.01f) // Within 1cm
             {

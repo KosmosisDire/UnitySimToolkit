@@ -11,7 +11,7 @@ using SimToolkit;
 
 public class URDFBuilder : MonoBehaviour
 {
-    public static async Task<UrdfRobot> Build(string urdfPath)
+    public static UrdfRobot Build(string urdfPath)
     {
         if (!File.Exists(urdfPath))
         {
@@ -21,10 +21,10 @@ public class URDFBuilder : MonoBehaviour
 
         var urdfText = File.ReadAllText(urdfPath);
 
-        return await BuildRuntime(urdfText, null, urdfPath);
+        return BuildRuntime(urdfText, null, urdfPath);
     }
 
-    public static async Task<UrdfRobot> BuildRuntime(string robotDescription, GameObject buildOnObject = null, string urdfPath = null)
+    public static UrdfRobot BuildRuntime(string robotDescription, GameObject buildOnObject = null, string urdfPath = null)
     {
         var pathUndefined = string.IsNullOrEmpty(urdfPath);
         if (pathUndefined)
@@ -104,7 +104,7 @@ public class URDFBuilder : MonoBehaviour
         return robot;
     }
 
-    public static UrdfLink BuildRecursive(UrdfLinkDef linkData, UrdfDescription urdf, UrdfLink? parent, UrdfRobot robot)
+    public static UrdfLink BuildRecursive(UrdfLinkDef linkData, UrdfDescription urdf, UrdfLink parent, UrdfRobot robot)
     {
         var link = BuildLink(linkData, urdf, parent);
         link.robot = robot;
@@ -119,7 +119,7 @@ public class URDFBuilder : MonoBehaviour
         return link;
     }
 
-    private static UrdfLink BuildLink(UrdfLinkDef linkData, UrdfDescription? urdf, UrdfLink? parent)
+    private static UrdfLink BuildLink(UrdfLinkDef linkData, UrdfDescription? urdf, UrdfLink parent)
     {
         var link = new GameObject(linkData.name).AddComponent<UrdfLink>();
         link.name = linkData.name;

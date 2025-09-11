@@ -140,7 +140,7 @@ public static class TGALoader
 
     public static Texture2D DecodeTGA(byte[] tgaData)
     {
-        const int iTgaHeaderSize = 18;
+        // const int iTgaHeaderSize = 18;
         const int iBytesPerPixelRGB24 = 3; // 1 byte per channel (rgb)
         const int iBytesPerPixelARGB32 = 4; // ~ (rgba)
 

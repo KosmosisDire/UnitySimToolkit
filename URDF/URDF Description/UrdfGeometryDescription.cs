@@ -20,7 +20,7 @@ public struct UrdfGeometryDef
     public UrdfBox? box;
     public UrdfCylinder? cylinder;
     public UrdfSphere? sphere;
-    public UrdfMesh? mesh;
+    public UrdfMesh mesh;
     public UrdfIGeometryType geometry;
 
     public static GeometryTypes GetGeometryType(string type)

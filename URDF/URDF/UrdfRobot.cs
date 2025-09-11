@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SimToolkit.ROS.Urdf;
 using UnityEngine;
-using NaughtyAttributes;
 
 public class UrdfRobot : MonoBehaviour
 {

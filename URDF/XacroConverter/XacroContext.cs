@@ -177,14 +177,14 @@ public class XacroMacroContext
         // Evaluate child elements
         for (int i = 0; i < element.ChildNodes.Count; i++)
         {
-            XmlNode? child = element.ChildNodes[i];
+            XmlNode child = element.ChildNodes[i];
             
             if (child is XmlElement childElement)
             {
                 if (childElement.Name == "xacro:insert-block")
                 {
                     string blockName = childElement.GetAttribute("name");
-                    if (AllAvailableProperties.TryGetValue(blockName, out IXacroProperty? block))
+                    if (AllAvailableProperties.TryGetValue(blockName, out IXacroProperty block))
                     {
                         if (block is XacroBlockProperty blockProp)
                         {

@@ -9,7 +9,7 @@ public class RuntimeUrdf : MonoBehaviour
     public bool enableVisuals = true;
     private List<MonoBehaviour> disabledComponents = new List<MonoBehaviour>();
 
-    async void Awake()
+    void Awake()
     {
         // disable all other components
         foreach (var component in GetComponents<MonoBehaviour>())
@@ -21,7 +21,7 @@ public class RuntimeUrdf : MonoBehaviour
             disabledComponents.Add(component);
         }
 
-        var robot = await URDFBuilder.BuildRuntime(robotDescription, gameObject);
+        var robot = URDFBuilder.BuildRuntime(robotDescription, gameObject);
         if (!enableColliders)
         {
             robot.DisableColliders();
