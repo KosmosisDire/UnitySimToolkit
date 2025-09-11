@@ -49,7 +49,7 @@ public class URDFImporterExtension
 
         var outputDir = PathHelper.GetParentPath(PathHelper.GetParentPath(assetPath));
         var outputPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(assetPath) + ".urdf");
-        Xacro2URDF.ConvertToURDF(assetPath, outputPath);
+        new XacroConverter(assetPath, outputPath).Convert();
         await URDFBuilder.Build(outputPath);
 
         File.Delete(outputPath);
