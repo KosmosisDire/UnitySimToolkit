@@ -80,7 +80,7 @@ namespace SimToolkit.ROS.Urdf
             LowerLimit = lower;
             UpperLimit = upper;
 
-            axisofMotion = joint.axis?.xyzRUF ?? Vector3.right;
+            axisofMotion = -joint.axis?.xyzRUF ?? -Vector3.right;
         }
 
         #endregion
